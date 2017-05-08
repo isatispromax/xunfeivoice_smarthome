@@ -1,0 +1,1 @@
+{"semantic":{"slots":{"attrValue":"开","attrType":"String","attr":"开关"}},"rc":0,"operation":"SET","service":"light_smartHome","text":"　天黑了"}

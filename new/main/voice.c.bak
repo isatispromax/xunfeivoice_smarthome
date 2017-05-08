@@ -1,0 +1,252 @@
+/*
+* This program could make voice to text
+*/
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <time.h>
+
+#include "qisr.h"
+#include "msp_cmn.h"
+#include "msp_errors.h"
+
+#define BUFFER_SIZE 2048
+#define HINTS_SIZE  100
+#define GRAMID_LEN  128
+#define FRAME_LEN 640 
+/*
+  *函数功能：语音转化为文字 
+  *audio_file_path: 音频文件地址
+*/
+void iat_mission(const char* audio_file_path)
+{
+  /*定义变量区*/
+  /*与数据读取有关*/
+  char          rec_result[BUFFER_SIZE]   = {'\0'}; 
+  char          hints[HINTS_SIZE]         = {'\0'}; //hints为结束本次会话的原因描述，由用户自定义
+  unsigned int  total_len                 = 0;
+  FILE*         fp_file                   = NULL;//保存文件的文件指针
+  char*         save_file_path            = "./result.txt"; //保存文件的路径
+
+  const char*   session_id                = NULL; //语音会话ID
+  int           errcode                   = MSP_SUCCESS; //记录会话登录错误ID
+  FILE*         fp_audio                  = NULL; //音频文件指针
+  long          audio_size                = 0;  //记录文件大小
+  char*         fp_buffer                 = NULL;   //上传缓冲区
+  long          read_buffer_size          = 0;  //上传的缓冲区大小写
+  int           ret                       = 0;  //记录返回值
+   /*与上传有关*/
+  int           audio_stat                = MSP_AUDIO_SAMPLE_CONTINUE;    //音频状态
+  long          audio_count               = 0;//当前上传的音频数量
+  int           ep_status                 = MSP_EP_LOOKING_FOR_SPEECH; //epstatus 端点检测
+  int           rec_status                = MSP_REC_STATUS_SUCCESS; //识别器所处的状态
+  time_t        time_this;
+
+
+  /*
+  * sub:        请求业务类型
+  * domain:     领域
+  * language:     语言
+  * accent:     方言
+  * sample_rate:    音频采样率
+  * result_type:    识别结果格式
+  * result_encoding:  结果编码格式
+  *
+  * 详细参数说明请参阅《讯飞语音云MSC--API文档》
+  */
+  const char* session_begin_params  = "sub = iat, domain = iat, language = zh_cn, sample_rate = 16000, result_type = plain, result_encoding = utf8";
+  
+  //0X01打开音频文件
+  if (NULL == audio_file_path)
+    goto asr_exit;
+
+  fp_audio = fopen(audio_file_path, "rb");
+  if (NULL == fp_audio) 
+  {
+    printf("\nopen [%s] failed! \n", audio_file_path);
+    goto asr_exit;
+  } 
+
+
+  printf("正在获取音频文件大小*******\n");
+  //0x02获取文件的大小
+  fseek(fp_audio, 0, SEEK_END);
+  audio_size = ftell(fp_audio); //获取音频文件大小 
+  fseek(fp_audio, 0, SEEK_SET);    
+  printf("正在为缓冲区分配内存地址*******\n");
+  //0x03为数据缓冲区分配内存区，并读取音频数据
+  fp_buffer = (char*)malloc(audio_size); //为缓冲区分配内存地址
+  if (NULL == fp_buffer)
+  {
+    printf("\nout of memory!\n");
+    goto asr_exit;
+  }
+  printf("正在读取音频文件*******\n");
+  read_buffer_size = fread((void *)fp_buffer, 1, audio_size, fp_audio); //读取音频文件内容，以字节为单位读入缓冲区
+  if (read_buffer_size != audio_size)
+  {
+    printf("\nread [%s] failed!\n", audio_file_path);
+    goto asr_exit;
+  }
+
+  //0x04会话登录
+  session_id = QISRSessionBegin(NULL, session_begin_params, &errcode);
+  printf("正在进行会话登录*******\n");
+  if(MSP_SUCCESS != errcode)
+  {
+    printf("Session begin failed,Errcode %d\n", errcode);
+    goto asr_exit;
+  }
+
+  //0x05上传语音数据
+  while(audio_stat != MSP_AUDIO_SAMPLE_LAST)
+  {
+    unsigned int audio_len = 10*FRAME_LEN;// 每次写入200ms音频(16k，16bit)：1帧音频20ms，10帧=200ms。16k采样率的16位音频，一帧的大小为640Byte
+   
+
+    if(audio_size < 2*audio_len)
+      audio_len = audio_size;
+    if(audio_len <= 0)
+      break;
+
+    //设置audio_stat
+    audio_stat = MSP_AUDIO_SAMPLE_CONTINUE; //还有后继音频
+    if (0 == audio_count)//上传第一块音频
+      audio_stat = MSP_AUDIO_SAMPLE_FIRST;
+
+    //上传音频
+    printf("正在上传第 %ld  块数据 *******\n ",audio_count/6400);
+    ret = QISRAudioWrite(session_id,(const void *)&fp_buffer[audio_count],audio_len,audio_stat,&ep_status,&rec_status);
+   // printf("0x0006 %d\n ",audio_count);
+    if (MSP_SUCCESS != ret)
+    {
+      printf("\nQISRAudioWrite failed, error code:%d\n",ret);
+      goto asr_exit;
+    }
+
+    /*计数变量增加*/
+    audio_count += (long)audio_len;
+    audio_size  -= (long)audio_len;
+
+    if (MSP_REC_STATUS_SUCCESS == rec_status) //已经有部分听写结果
+    {
+      const char *rslt = QISRGetResult(session_id, &rec_status, 0, &errcode);
+      if (MSP_SUCCESS != errcode)
+      {
+        printf("\nQISRGetResult failed! error code: %d\n", errcode);
+        goto asr_exit;
+      }
+      if (NULL != rslt)
+      {
+        unsigned int rslt_len = strlen(rslt);
+        total_len += rslt_len;
+        if (total_len >= BUFFER_SIZE)
+        {
+          printf("\nno enough buffer for rec_result !\n");
+          goto asr_exit;
+        }
+        strncat(rec_result, rslt, rslt_len);
+      }
+    }
+    //usleep(200*1000); //模拟人说话时间间隙，10帧的音频长度为200ms
+  }
+  /*上传最后一段音频*/
+  printf("正在上传最后一块音频*******\n");
+  errcode = QISRAudioWrite(session_id, NULL, 0, MSP_AUDIO_SAMPLE_LAST, &ep_status, &rec_status);
+  //  printf("0x0008\n");
+  if (MSP_SUCCESS != errcode)
+  {
+    printf("\nQISRAudioWrite end failed , error code:%d\n",errcode);
+    goto asr_exit;  
+  }
+ //free(fp_buffer);
+  /*读取音频识别结果*/
+ printf("正在获取识别结果*******\n");
+  while (MSP_REC_STATUS_COMPLETE != rec_status) 
+  {
+    const char *rslt = QISRGetResult(session_id, &rec_status, 0, &errcode);
+    if (MSP_SUCCESS != errcode)
+    {
+      printf("\nQISRGetResult failed, error code: %d\n", errcode);
+      goto asr_exit;
+    }
+    if (NULL != rslt)
+    {
+      unsigned int rslt_len = strlen(rslt);
+      total_len += rslt_len;
+      if (total_len >= BUFFER_SIZE)
+      {
+        printf("\nno enough buffer for rec_result !\n");
+        goto asr_exit;
+      }
+      strncat(rec_result, rslt, rslt_len);
+    }
+    usleep(150*1000); //防止频繁占用CPU
+  }
+
+  /*将结果保存到result.txt*/
+  printf("识别结果为 :  %s\n", rec_result);
+
+
+  if((fp_file = fopen(save_file_path,"a")) != NULL )
+  {
+ //   fprintf(fp_file, "[%s]:", ctime(&time_this));
+    fprintf(fp_file, "%s\n", &rec_result);
+    fclose(fp_file);
+  }
+  else
+  {
+    printf("open save file error!\n" );
+  }
+  
+
+    QISRSessionEnd(session_id, hints);
+asr_exit:
+  if (NULL != fp_audio)
+  {
+    fclose(fp_audio);
+    fp_audio = NULL;
+  }
+  if (NULL != fp_buffer)
+  { free(fp_buffer);
+    fp_buffer = NULL;
+  }
+  QISRSessionEnd(session_id, hints);
+}
+
+
+
+/*
+  *第一个参数为音频文件名
+  *argv[1] --- 文件名
+*/
+int main(int argc, char *argv[])
+{
+
+  int     ret           = MSP_SUCCESS;
+//  int     upload_on       = 1; //是否上传用户词表
+  const char* login_params      =  "appid = 582199a5, work_dir = ."; // 登录参数，appid与msc库绑定,请勿随意改动
+
+
+  /* 用户登录 */
+  ret = MSPLogin(NULL, NULL, login_params); //第一个参数是用户名，第二个参数是密码，均传NULL即可，第三个参数是登录参数
+    if (MSP_SUCCESS != ret)
+  {
+    printf("MSPLogin failed , Error code %d.\n",ret);
+    goto main_exit; //登录失败，退出登录
+  }
+  /*用户登录认证*/
+  iat_mission(argv[1]);
+  MSPLogout(); 
+  return 1;
+main_exit:
+  printf("massion failed!");
+
+  MSPLogout();
+  return 0;	
+
+  /* code */
+  
+}

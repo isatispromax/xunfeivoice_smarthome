@@ -1,0 +1,210 @@
+.
+├── bin //执行文件
+│   ├── gm_continuous_digit.abnf
+│   ├── msc
+│   │   ├── 4e4aff9b2b885b1af5a269c4354118fb
+│   │   │   └── u.data
+│   │   ├── legacyschr.log
+│   │   ├── lgi.log
+│   │   ├── msc.cfg
+│   │   ├── msc.log
+│   │   └── waiter.log
+│   ├── semantic.txt
+│   ├── source.txt
+│   ├── test.txt
+│   ├── userwords.txt
+│   ├── vs
+│   └── wav
+│       ├── iflytek01.wav
+│       ├── iflytek02.wav
+│       └── weather.pcm
+├── doc //讯飞文档
+│   ├── Grammar Development Guidelines.chm
+│   ├── iFlytek MSC Reference Manual
+│   │   ├── all__0_8js.html
+│   │   ├── all__1_8js.html
+│   │   ├── arrowdown.png
+│   │   ├── arrowright.png
+│   │   ├── bc_s.png
+│   │   ├── bdwn.png
+│   │   ├── closed.png
+│   │   ├── dir_25539194184bab781b1c7ecd67774cd8.html
+│   │   ├── dir_9a65024ac0a05d9abfc2bb6c7ff8f818.html
+│   │   ├── doc.png
+│   │   ├── doxygen.css
+│   │   ├── doxygen.png
+│   │   ├── dynsections_8js.html
+│   │   ├── dynsections.js
+│   │   ├── files__0_8js.html
+│   │   ├── files__1_8js.html
+│   │   ├── files.html
+│   │   ├── folderclosed.png
+│   │   ├── folderopen.png
+│   │   ├── functions__0_8js.html
+│   │   ├── functions__1_8js.html
+│   │   ├── globals_func.html
+│   │   ├── globals.html
+│   │   ├── globals_vars.html
+│   │   ├── index.html
+│   │   ├── jquery_8js.html
+│   │   ├── jquery.js
+│   │   ├── msp__cmn_8h.html
+│   │   ├── msp__cmn_8h_source.html
+│   │   ├── nav_f.png
+│   │   ├── nav_g.png
+│   │   ├── nav_h.png
+│   │   ├── open.png
+│   │   ├── qisr_8h.html
+│   │   ├── qisr_8h_source.html
+│   │   ├── qmfv_8h.html
+│   │   ├── qmfv_8h_source.html
+│   │   ├── qtts_8h.html
+│   │   ├── qtts_8h_source.html
+│   │   ├── search
+│   │   │   ├── all_0.html
+│   │   │   ├── all_0.js
+│   │   │   ├── all_10.html
+│   │   │   ├── all_10.js
+│   │   │   ├── all_11.html
+│   │   │   ├── all_11.js
+│   │   │   ├── all_1.html
+│   │   │   ├── all_1.js
+│   │   │   ├── all_2.html
+│   │   │   ├── all_2.js
+│   │   │   ├── all_3.html
+│   │   │   ├── all_3.js
+│   │   │   ├── all_4.html
+│   │   │   ├── all_4.js
+│   │   │   ├── all_5.html
+│   │   │   ├── all_5.js
+│   │   │   ├── all_6.html
+│   │   │   ├── all_6.js
+│   │   │   ├── all_7.html
+│   │   │   ├── all_7.js
+│   │   │   ├── all_8.html
+│   │   │   ├── all_8.js
+│   │   │   ├── all_9.html
+│   │   │   ├── all_9.js
+│   │   │   ├── all_a.html
+│   │   │   ├── all_a.js
+│   │   │   ├── all_b.html
+│   │   │   ├── all_b.js
+│   │   │   ├── all_c.html
+│   │   │   ├── all_c.js
+│   │   │   ├── all_d.html
+│   │   │   ├── all_d.js
+│   │   │   ├── all_e.html
+│   │   │   ├── all_e.js
+│   │   │   ├── all_f.html
+│   │   │   ├── all_f.js
+│   │   │   ├── close.png
+│   │   │   ├── files_0.html
+│   │   │   ├── files_0.js
+│   │   │   ├── files_1.html
+│   │   │   ├── files_1.js
+│   │   │   ├── files_2.html
+│   │   │   ├── files_2.js
+│   │   │   ├── files_3.html
+│   │   │   ├── files_3.js
+│   │   │   ├── files_4.html
+│   │   │   ├── files_4.js
+│   │   │   ├── files_5.html
+│   │   │   ├── files_5.js
+│   │   │   ├── files_6.html
+│   │   │   ├── files_6.js
+│   │   │   ├── functions_0.html
+│   │   │   ├── functions_0.js
+│   │   │   ├── functions_1.html
+│   │   │   ├── functions_1.js
+│   │   │   ├── functions_2.html
+│   │   │   ├── functions_2.js
+│   │   │   ├── functions_3.html
+│   │   │   ├── functions_3.js
+│   │   │   ├── functions_4.html
+│   │   │   ├── functions_4.js
+│   │   │   ├── functions_5.html
+│   │   │   ├── functions_5.js
+│   │   │   ├── functions_6.html
+│   │   │   ├── functions_6.js
+│   │   │   ├── functions_7.html
+│   │   │   ├── functions_7.js
+│   │   │   ├── functions_8.html
+│   │   │   ├── functions_8.js
+│   │   │   ├── functions_9.html
+│   │   │   ├── functions_9.js
+│   │   │   ├── functions_a.html
+│   │   │   ├── functions_a.js
+│   │   │   ├── mag_sel.png
+│   │   │   ├── nomatches.html
+│   │   │   ├── search.css
+│   │   │   ├── searchdata.js
+│   │   │   ├── search.js
+│   │   │   ├── search_l.png
+│   │   │   ├── search_m.png
+│   │   │   ├── search_r.png
+│   │   │   ├── variables_0.html
+│   │   │   ├── variables_0.js
+│   │   │   ├── variables_1.html
+│   │   │   ├── variables_1.js
+│   │   │   ├── variables_2.html
+│   │   │   ├── variables_2.js
+│   │   │   ├── variables_3.html
+│   │   │   ├── variables_3.js
+│   │   │   ├── variables_4.html
+│   │   │   ├── variables_4.js
+│   │   │   ├── variables_5.html
+│   │   │   ├── variables_5.js
+│   │   │   ├── variables_6.html
+│   │   │   ├── variables_6.js
+│   │   │   ├── variables_7.html
+│   │   │   └── variables_7.js
+│   │   ├── search_8js.html
+│   │   ├── searchdata_8js.html
+│   │   ├── splitbar.png
+│   │   ├── sync_off.png
+│   │   ├── sync_on.png
+│   │   ├── tab_a.png
+│   │   ├── tab_b.png
+│   │   ├── tab_h.png
+│   │   ├── tabs.css
+│   │   └── tab_s.png
+│   ├── MSC Novice Manual for Linux.pdf
+│   ├── Open Semantic Platform API Documents.pdf
+│   └── Recording API Documents_.doc
+├── include //用到对文件
+│   ├── cJSON.h
+│   ├── msp_cmn.h
+│   ├── msp_errors.h
+│   ├── msp_types.h
+│   ├── qisr.h
+│   └── qtts.h
+├── libs//讯飞的支持库
+│   ├── x64
+│   │   └── libmsc.so
+│   └── x86
+│       └── libmsc.so
+├── main //程序代码主文件
+│   ├── 123.txt
+│   ├── 64bit_make.sh
+│   ├── cJSON.c
+│   ├── cJSON.h
+│   ├── cJSON.o
+│   ├── codecon.c.tmp
+│   ├── codecon.h
+│   ├── codecon.h.tmp
+│   ├── Makefile
+│   ├── sch_txt.c.bak
+│   ├── server.c
+│   ├── server.h
+│   ├── server.o
+│   ├── utf-8.txt
+│   ├── voice.c.bak
+│   ├── vs.c
+│   ├── vs.h
+│   └── vs.o
+└── README
+改变 server.c lines 69 的服务器ip地址，运行64bit_make.sh，生成服务器文件
+服务器文件为bin目录下的vs，运行时加、vs text.txt.测试服务命令解析是否正常
+
+
+12 directories, 192 files
